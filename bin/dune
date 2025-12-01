@@ -1,4 +1,4 @@
 (executable
- (public_name advent)
+ (public_name aoc)
  (name aoc)
  (libraries days advent))
