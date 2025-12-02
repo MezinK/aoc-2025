@@ -15,8 +15,8 @@ let () =
       exit 1
   | Some (module D : Days.S) ->
       let input_path = Printf.sprintf "days/day%02d/input.txt" D.day in
-      let input = Util.read_lines input_path in
-      let r1, t1 = Util.time_pretty D.part1 input in
-      let r2, t2 = Util.time_pretty D.part2 input in
+      let input = Input.read_lines input_path in
+      let r1, t1 = Timer.time_pretty D.part1 input in
+      let r2, t2 = Timer.time_pretty D.part2 input in
       Printf.printf "Day %02d - Part 1: %s (took %s)\n" day r1 t1;
       Printf.printf "Day %02d - Part 2: %s (took %s)\n" day r2 t2

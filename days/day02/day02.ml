@@ -10,7 +10,7 @@ let parse_interval interval =
   | _ -> invalid_arg "parse_interval failed"
 
 let parse_and_expand input =
-  input |> Util.handle_comma_input
+  input |> Input.handle_comma_input
   |> List.map (String.split_on_char '-')
   |> List.map parse_interval |> List.concat_map expand
 

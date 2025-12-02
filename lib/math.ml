@@ -1,1 +1,1 @@
-let sum list = List.fold_left ( + ) 0 list
+let sum = List.fold_left ( + ) 0
