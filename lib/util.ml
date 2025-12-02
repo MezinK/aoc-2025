@@ -9,6 +9,8 @@ let read_lines filename =
   in
   loop []
 
+let handle_comma_input = List.concat_map (String.split_on_char ',')
+
 let time f x =
   let start = Unix.gettimeofday () in
   let res = f x in

@@ -4,5 +4,5 @@ module type S = sig
   val part2 : string list -> string
 end
 
-let registry = [ (1, (module Day01 : S)) ]
+let registry = [ (1, (module Day01 : S)); (2, (module Day02 : S)) ]
 let get day = List.assoc_opt day registry
