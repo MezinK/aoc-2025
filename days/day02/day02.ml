@@ -14,20 +14,22 @@ let parse_and_expand input =
   |> List.map (String.split_on_char '-')
   |> List.map parse_interval |> List.concat_map expand
 
-let split_into_chunks k s =
-  if k = 0 then invalid_arg "split_into_chunk k > 0"
-  else
-    let len = String.length s in
-    let rec loop i acc =
-      if i >= len then List.rev acc
-      else
-        let take = min k (len - i) in
-        loop (i + take) (String.sub s i take :: acc)
-    in
-    loop 0 []
+let all_chars_equal s =
+  let len = String.length s in
+  len > 1
+  &&
+  let c0 = s.[0] in
+  let rec loop i =
+    if i = len then true else if c0 <> s.[i] then false else loop (i + 1)
+  in
+  loop 1
 
-let all_equal l =
-  match l with [] | [ _ ] -> false | x :: xs -> List.for_all (( = ) x) xs
+let is_repetition s k =
+  let len = String.length s in
+  let rec loop i =
+    if i = len then true else if s.[i] <> s.[i - k] then false else loop (i + 1)
+  in
+  loop k
 
 let is_id_invalid n =
   let s = string_of_int n in
@@ -35,16 +37,26 @@ let is_id_invalid n =
   len mod 2 = 0
   &&
   let half = len / 2 in
-  String.sub s 0 half = String.sub s half half
+  let rec loop i =
+    if i = half then true
+    else if s.[i] <> s.[i + half] then false
+    else loop (i + 1)
+  in
+  loop 0
 
 let is_id_invalid2 n =
   let s = string_of_int n in
   let len = String.length s in
-  if all_equal (split_into_chunks 1 s) then true
+  if len <= 1 then false
+  else if all_chars_equal s then true
   else
-    List.init (len / 2) (fun x -> x + 2)
-    |> List.filter (fun k -> len mod k = 0)
-    |> List.exists (fun k -> all_equal (split_into_chunks k s))
+    let rec try_repetition k =
+      if k > len / 2 then false
+      else if len mod k <> 0 then try_repetition (k + 1)
+      else if is_repetition s k then true
+      else try_repetition (k + 1)
+    in
+    try_repetition 2
 
 let part1 input =
   input |> parse_and_expand |> List.filter is_id_invalid |> Math.sum
