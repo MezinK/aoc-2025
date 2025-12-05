@@ -5,6 +5,11 @@ module type S = sig
 end
 
 let registry =
-  [ (1, (module Day01 : S)); (2, (module Day02 : S)); (3, (module Day03 : S)) ]
+  [
+    (1, (module Day01 : S));
+    (2, (module Day02 : S));
+    (3, (module Day03 : S));
+    (4, (module Day04 : S));
+  ]
 
 let get day = List.assoc_opt day registry
