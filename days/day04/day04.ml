@@ -53,7 +53,7 @@ let remove_accessible_rolls grid =
   List.iter (fun (r, c) -> grid.(r).(c) <- '.') !track;
   !count
 
-let keep_removing grid =
+let remove_until_zero grid =
   let total = ref 0 in
   let removed_count = ref (remove_accessible_rolls grid) in
   total := !total + !removed_count;
@@ -66,4 +66,4 @@ let keep_removing grid =
 
 let day = 4
 let part1 input = input |> parse_grid |> count_accessible_rolls |> string_of_int
-let part2 input = input |> parse_grid |> keep_removing |> string_of_int
+let part2 input = input |> parse_grid |> remove_until_zero |> string_of_int
