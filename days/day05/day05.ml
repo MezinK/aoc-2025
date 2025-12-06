@@ -1,3 +1,5 @@
+open Advent
+
 let get_range s =
   let s, e =
     match String.split_on_char '-' s with
@@ -12,25 +14,40 @@ let get_fresh_ids_and_ingredients input =
     | None -> failwith "empty str index not found"
     | Some i -> i
   in
-  let ranges_lst = List.take (idx - 1) input in
-  let ingredients_lst = List.drop (idx + 1) input in
-  let ranges = List.map get_range ranges_lst in
-  let ingredients = ingredients_lst |> List.map int_of_string in
+  let ranges = List.take idx input in
+  let ingredients = List.drop (idx + 1) input in
+  let ranges' = List.map get_range ranges in
+  let ingredients' = ingredients |> List.map int_of_string in
 
-  (ranges, ingredients)
+  (ranges', ingredients')
 
-(*tbd*)
 let get_fresh_id_ranges input =
   let idx =
     match List.find_index (( = ) "") input with
     | None -> failwith "empty str index not found"
     | Some i -> i
   in
-  let ranges_lst = List.take (idx - 1) input in
-  let ranges = List.map get_range ranges_lst in
-  List.fold_left (fun acc (s, e) -> acc + e - s + 1) 0 ranges
+  let ranges = List.take idx input in
+  List.map get_range ranges
 
 let in_any_range x ranges = List.exists (fun (s, e) -> x >= s && x <= e) ranges
+
+let merge_ranges ranges =
+  let ranges = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) ranges in
+  let rec loop acc = function
+    | [] -> acc
+    | (s, e) :: tl -> (
+        match acc with
+        | [] -> loop [ (s, e) ] tl
+        | (cs, ce) :: tl' ->
+            if s <= ce + 1 then
+              let ce' = max ce e in
+              loop ((cs, ce') :: tl') tl
+            else loop ((s, e) :: acc) tl)
+  in
+  loop [] ranges
+
+let count_ids_in_range range = List.map (fun (s, e) -> e - s + 1) range
 let day = 5
 
 let part1 input =
@@ -40,5 +57,6 @@ let part1 input =
     0 ingredients
   |> string_of_int
 
-(*tbd*)
-let part2 input = input |> get_fresh_id_ranges |> string_of_int
+let part2 input =
+  input |> get_fresh_id_ranges |> merge_ranges |> count_ids_in_range |> Math.sum
+  |> string_of_int
