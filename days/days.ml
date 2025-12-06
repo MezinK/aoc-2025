@@ -11,6 +11,7 @@ let registry =
     (3, (module Day03 : S));
     (4, (module Day04 : S));
     (5, (module Day05 : S));
+    (6, (module Day06 : S));
   ]
 
 let get day = List.assoc_opt day registry
