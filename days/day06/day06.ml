@@ -74,14 +74,12 @@ let solve2 grid =
     | _ -> failwith "unknown operator"
   in
 
-  let rec loop c is_group current_cols acc =
-    if c < 0 then if is_group then eval current_cols :: acc else acc
-    else if is_seperator_col c then
-      if is_group then loop (c - 1) false [] (eval current_cols :: acc)
-      else loop (c - 1) false [] acc
-    else loop (c - 1) true (c :: current_cols) acc
+  let rec loop c current_cols acc =
+    if c < 0 then eval current_cols :: acc
+    else if is_seperator_col c then loop (c - 1) [] (eval current_cols :: acc)
+    else loop (c - 1) (c :: current_cols) acc
   in
-  loop (cols - 1) false [] []
+  loop (cols - 1) [] []
 
 let day = 6
 let part1 input = input |> parse_grid |> solve |> Math.sum |> string_of_int
