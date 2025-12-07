@@ -12,15 +12,16 @@ let parse_grid input =
     input;
   grid
 
-let solve grid =
+let get_start_col r grid =
+  match Array.find_index (( = ) 'S') grid.(r) with
+  | Some col -> col
+  | None -> failwith "Start column not found"
+
+let count_splits grid =
   let rows = Array.length grid in
   let cols = Array.length grid.(0) in
   let start_row = 0 in
-  let start_col =
-    match Array.find_index (( = ) 'S') grid.(start_row) with
-    | Some col -> col
-    | None -> failwith "Start column not found"
-  in
+  let start_col = get_start_col start_row grid in
 
   let curr = ref (IntSet.singleton start_col) in
   let splits = ref 0 in
@@ -45,6 +46,28 @@ let solve grid =
 
   !splits
 
+let count_timelines grid =
+  let rows = Array.length grid in
+  let start_row = 0 in
+  let start_col = get_start_col start_row grid in
+  let memo = Hashtbl.create 10000 in
+  let rec dfs (r, c) =
+    if r == rows then 1
+    else
+      match Hashtbl.find_opt memo (r, c) with
+      | Some m -> m
+      | None ->
+          let res =
+            match grid.(r).(c) with
+            | '.' -> dfs (r + 1, c)
+            | '^' -> dfs (r + 1, c + 1) + dfs (r + 1, c - 1)
+            | _ -> failwith (Printf.sprintf "dfs failed on row: %d col: %d" r c)
+          in
+          Hashtbl.add memo (r, c) res;
+          res
+  in
+  dfs (start_row + 1, start_col)
+
 let day = 7
-let part1 input = input |> parse_grid |> solve |> string_of_int
-let part2 _ = ""
+let part1 input = input |> parse_grid |> count_splits |> string_of_int
+let part2 input = input |> parse_grid |> count_timelines |> string_of_int
