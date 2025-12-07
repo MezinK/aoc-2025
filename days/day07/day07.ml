@@ -23,28 +23,31 @@ let count_splits grid =
   let start_row = 0 in
   let start_col = get_start_col start_row grid in
 
-  let curr = ref (IntSet.singleton start_col) in
-  let splits = ref 0 in
-  for r = start_row + 1 to rows - 1 do
-    let next = ref IntSet.empty in
-    let seen = ref IntSet.empty in
-    let queue = ref (IntSet.elements !curr) in
-    while !queue <> [] do
-      let c = List.hd !queue in
-      queue := List.tl !queue;
-      if c >= 0 && c < cols && not (IntSet.mem c !seen) then begin
-        seen := IntSet.add c !seen;
-        match grid.(r).(c) with
-        | '^' ->
-            incr splits;
-            queue := (c + 1) :: (c - 1) :: !queue
-        | _ -> next := IntSet.add c !next
-      end
-    done;
-    curr := !next
-  done;
+  let rec bfs r acc seen next = function
+    | [] -> (next, acc)
+    | c :: queue -> (
+        if c < 0 || c >= cols || IntSet.mem c seen then
+          bfs r acc seen next queue
+        else
+          let seen = IntSet.add c seen in
+          match grid.(r).(c) with
+          | '^' ->
+              let queue = (c + 1) :: (c - 1) :: queue in
+              bfs r (acc + 1) seen next queue
+          | _ ->
+              let next = IntSet.add c next in
+              bfs r acc seen next queue)
+  in
 
-  !splits
+  let rec loop r curr acc =
+    if r = rows then acc
+    else
+      let queue = IntSet.elements curr in
+      let next, acc = bfs r acc IntSet.empty IntSet.empty queue in
+      loop (r + 1) next acc
+  in
+  let init = IntSet.singleton start_col in
+  loop start_row init 0
 
 let count_timelines grid =
   let rows = Array.length grid in
